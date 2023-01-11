@@ -191,46 +191,35 @@ git clone https://github.com/ibm-messaging/mq-helm.git
 ```
 
 ### Installation
-- Log into AWS EKS via CLI [ref](https://aws.amazon.com/premiumsupport/knowledge-center/eks-cluster-connection/)
-- Add the helm chart to your repo
+
+Add the helm chart to your repo
 ```
-cd  mq-helm/samples/AWSEKS/deploy
-./install.sh mq-eks mqpasswd mqpasswd
-```
-
-This will deploy a number of resources:
-- The IBM MQ Helm Chart using the properties within the [secureapp_nativeha.yaml](https://github.com/ibm-messaging/mq-helm/blob/main/samples/AWSEKS/deploy/secureapp_nativeha.yaml) file.
-- A configMap with MQ configuration to define a default Queue, and the security required.
-- A secret that includes certificates and keys from the `genericresources/createcerts` directory. Assuring the communication in MQ is secure.
-This will take a minute or so to deploy, and the status can be checked with the following command: `kubectl get pods | grep secureapp`. Wait until one of the three Pods is showing `1/1` under the ready status (only one will ever show this, the remaining two will be `0/1` showing they are replicas).
-
-
-```
-deploy git:(main) ./install.sh mq-eks
-Context "arn:aws:eks:us-east-1:748107796891:cluster/mq-cluster" modified.
-configmap/helmsecure created
-secret/helmsecure created
-NAME: secureapphelm
-LAST DEPLOYED: Mon Jan  9 16:10:18 2023
-NAMESPACE: mq-eks
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-NOTES:
-Get the MQ Console URL by running these commands:
-  export CONSOLE_PORT=$(kubectl get services secureapphelm-ibm-mq-web -n mq-eks -o jsonpath="{.spec.ports[?(@.port=="9443")].nodePort}")
-  export CONSOLE_IP=$(kubectl get nodes -o jsonpath='{..addresses[1].address}' | awk '{print $1}')
-  echo https://$CONSOLE_IP:$CONSOLE_PORT/ibmmq/console
-
-Get the load balancer exposed MQ Console URL by running these commands:
-  export CONSOLE_PORT=9443
-  export CONSOLE_IP=$(kubectl get services secureapphelm-ibm-mq-loadbalancer -n mq-eks -o jsonpath="{..hostname}")$(kubectl get services secureapphelm-ibm-mq-loadbalancer -n mq-eks -o jsonpath="{..ip}")
-  echo https://$CONSOLE_IP:$CONSOLE_PORT/ibmmq/console
-The MQ connection information for clients inside the cluster is as follows:
-  secureapphelm-ibm-mq:1414
+helm repo add ibm-messaging-mq https://ibm-messaging.github.io/mq-helm
+"ibm-messaging-mq" has been added to your repositories
 ```
 
-- Verify that the pods are up
+Show all the charts in that repo
+
+```
+helm show chart ibm-messaging-mq/ibm-mq
+
+apiVersion: v2
+appVersion: 9.3.1.0
+description: IBM MQ queue manager
+icon: https://raw.githubusercontent.com/IBM/charts/master/logo/ibm-mq-blue-icon.png
+keywords:
+- IBM MQ
+- MQ
+- amd64
+- message queue
+- Integration
+kubeVersion: '>=1.18.0-0'
+name: ibm-mq
+type: application
+version: 4.0.0
+```
+
+Create the following yamls
 
 `mtlsqm.yaml`
 
@@ -269,7 +258,7 @@ type: Opaque
 
 This will have several certs already encrypted base64 for testing.
 
-- `secureapp_nativeha.yaml`
+- `mqekspoc_values.yaml`
 
 ```
 # © Copyright IBM Corporation 2021, 2022
@@ -376,31 +365,31 @@ kubectl apply -f mtlsqm.yaml
 - Now install the helm chart
 
 ```
-helm install secureapphelm ibm-messaging-mq/ibm-mq \
--f secureapp_nativeha.yaml \
+helm install mqekspoc ibm-messaging-mq/ibm-mq \
+-f mqekspoc_values.yaml \
 --set "queueManager.envVariables[0].name=MQ_ADMIN_PASSWORD" \
 --set "queueManager.envVariables[0].value=mqpasswd" \
 --set "queueManager.envVariables[1].name=MQ_APP_PASSWORD" \
 --set "queueManager.envVariables[1].value=mqpasswd"
 
-NAME: secureapphelm
+NAME: mqekspoc
 LAST DEPLOYED: Tue Jan 10 16:08:43 2023
-NAMESPACE: mq-eks
+NAMESPACE: 
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
 NOTES:
 Get the MQ Console URL by running these commands:
-  export CONSOLE_PORT=$(kubectl get services secureapphelm-ibm-mq-web -n mq-eks -o jsonpath="{.spec.ports[?(@.port=="9443")].nodePort}")
+  export CONSOLE_PORT=$(kubectl get services mqekspoc-ibm-mq-web -n mq-eks -o jsonpath="{.spec.ports[?(@.port=="9443")].nodePort}")
   export CONSOLE_IP=$(kubectl get nodes -o jsonpath='{..addresses[1].address}' | awk '{print $1}')
   echo https://$CONSOLE_IP:$CONSOLE_PORT/ibmmq/console
 
 Get the load balancer exposed MQ Console URL by running these commands:
   export CONSOLE_PORT=9443
-  export CONSOLE_IP=$(kubectl get services secureapphelm-ibm-mq-loadbalancer -n mq-eks -o jsonpath="{..hostname}")$(kubectl get services secureapphelm-ibm-mq-loadbalancer -n mq-eks -o jsonpath="{..ip}")
+  export CONSOLE_IP=$(kubectl get services mqekspoc-ibm-mq-loadbalancer -n mq-eks -o jsonpath="{..hostname}")$(kubectl get services mqekspoc-ibm-mq-loadbalancer -n mq-eks -o jsonpath="{..ip}")
   echo https://$CONSOLE_IP:$CONSOLE_PORT/ibmmq/console
 The MQ connection information for clients inside the cluster is as follows:
-  secureapphelm-ibm-mq:1414
+  mqekspoc-ibm-mq:1414
 ```
 
 Following the returned prompts above, you should be able to retrieve the webui url.
@@ -408,12 +397,11 @@ Following the returned prompts above, you should be able to retrieve the webui u
 User/pass: `admin/mqpasswd`
 
 This will deploy a number of resources:
--   The IBM MQ Helm Chart using the properties within the [secureapp_nativeha.yaml](https://github.com/ibm-messaging/mq-helm/blob/main/samples/AWSEKS/deploy/secureapp_nativeha.yaml) file.
 - A configMap with MQ configuration to define a default Queue, and the security required.
 - A secret that includes certificates and keys from the `genericresources/createcerts` directory. Assuring the communication in MQ is secure.
-This will take a minute or so to deploy, and the status can be checked with the following command: `kubectl get pods | grep secureapp`. Wait until one of the three Pods is showing `1/1` under the ready status (only one will ever show this, the remainding two will be `0/1` showing they are replicas).
+This will take a minute or so to deploy, and the status can be checked with the following command: `kubectl get pods | grep secureapp`. If you've enabled `nativeha` with a `true` value, then three pods will be generated. Wait until one of the three Pods is showing `1/1` under the ready status (only one will ever show this, the remainding two will be `0/1` showing they are replicas). If `nativeha` is set to `false`, only one pod will come up.
 
-verify the pods are up
+verify the pods are up. If we enabled nativeha in our values you should see three. Otherwise just one.
 ```
 kubectl get pods
 NAME                     READY   STATUS    RESTARTS   AGE
@@ -421,8 +409,6 @@ secureapphelm-ibm-mq-0   1/1     Running   0          25m
 secureapphelm-ibm-mq-1   0/1     Running   0          25m
 secureapphelm-ibm-mq-2   0/1     Running   0          25m
 ```
-
-This is normal behavior since only one will ever be up. The other two are replicas.
 
 Relevant helm charts
 `
