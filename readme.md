@@ -286,9 +286,19 @@ This will have several certs already encrypted base64 for testing.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 license: accept
+image:
+  # repository is the container repository to use
+  repository: docker-cotsimage-gts-dev.gslb.thc.travp.net/icr.io/ibm-messaging/mq
+  # tag is the tag to use for the container repository
+  tag: latest
+  # pullSecret is the secret to use when pulling the image from a private registry
+  pullSecret: ics-cots-pullsecret
+  # pullPolicy is either IfNotPresent or Always (https://kubernetes.io/docs/concepts/containers/images/)
+  pullPolicy: IfNotPresent
+
 queueManager:
   nativeha:
-    enable: true
+    enable: false
     tls:
       secretName: helmsecure
   mqscConfigMaps:
@@ -299,13 +309,32 @@ queueManager:
     - name: helmsecure
       items:
         - mq.ini
-persistence:
-  qmPVC:
-    enable: true
-    storageClassName: gp2
+  multiinstance:
+    enable: false
+  persistence:
+    dataPVC:
+      enable: false
+      name: "data"
+      size: 2Gi
+      storageClassName: "ebs-sc"
+    logPVC:
+      enable: false
+      name: "log"
+      size: 2Gi
+      storageClassName: "ebs-sc"
+    qmPVC:
+      enable: true
+      name: "qm"
+      size: 2Gi
+      storageClassName: "ebs-sc"
+
 security:
   context:
-    fsGroup: 0
+    fsGroup: 65534
+    supplementalGroups: [65534]
+  initVolumeAsRoot: false
+  runAsUser: 65534
+
 pki:
   keys:
     - name: default
@@ -333,7 +362,7 @@ route:
   loadBalancer:
     webconsole: true
     mqtraffic: true
-
+    
 ```
 
 - Log into AWS EKS via CLI [ref](https://aws.amazon.com/premiumsupport/knowledge-center/eks-cluster-connection/)
