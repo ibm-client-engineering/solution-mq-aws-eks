@@ -277,7 +277,7 @@ This will have several certs already encrypted base64 for testing.
 license: accept
 image:
   # repository is the container repository to use
-  repository: docker-cotsimage-gts-dev.gslb.thc.travp.net/icr.io/ibm-messaging/mq
+  repository: <URL FOR AIRGAPPED REPO>/icr.io/ibm-messaging/mq
   # tag is the tag to use for the container repository
   tag: latest
   # pullSecret is the secret to use when pulling the image from a private registry
