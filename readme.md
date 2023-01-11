@@ -35,6 +35,8 @@ The scope of this technical engagement includes the following:
 - [ ]   Overview of basic operational procedures such as upgrades and patches
 - [ ]   Support during the deployment and initial configuration of IBM MQ on EKS
 
+<img width="500" alt="image" src="https://user-images.githubusercontent.com/95059/211837985-f893a5bf-de58-47df-a996-10682e2c7fad.png">
+
 # Solution Strategy
 
 ## Overview
