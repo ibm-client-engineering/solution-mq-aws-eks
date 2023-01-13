@@ -443,6 +443,7 @@ keywords:
   - message queue
   - Integration
 icon: https://raw.githubusercontent.com/IBM/charts/master/logo/ibm-mq-blue-icon.png
+```
 
 To add a `loadBalancerSourceRanges` to the chart, I had to modify the following file in the source repo from github:
 
