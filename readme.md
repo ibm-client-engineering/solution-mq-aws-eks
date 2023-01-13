@@ -414,7 +414,7 @@ secureapphelm-ibm-mq-2   0/1     Running   0          25m
 ```
 
 Relevant helm charts
-`
+
 ```
 # © Copyright IBM Corporation 2021, 2022
 #
@@ -443,6 +443,7 @@ keywords:
   - message queue
   - Integration
 icon: https://raw.githubusercontent.com/IBM/charts/master/logo/ibm-mq-blue-icon.png
+```
 
 To add a `loadBalancerSourceRanges` to the chart, I had to modify the following file in the source repo from github:
 
@@ -577,7 +578,7 @@ route:
   loadBalancer:
     webconsole: true
     mqtraffic: true
-    loadBalancerSourceRanges: ["1.2.3.4/16","2.1.3.4/16"]
+    loadBalancerSourceRanges: ["1.2.3.4/16","2.1.3.4/16","192.168.0.0/16"]
 ```
 
 It's important to note that the loadBalancerSourceRanges are for inbound traffic to the cluster. Our example above shows a bunch of mostly private ip ranges, thus limiting traffic to whatever local network.
