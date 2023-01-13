@@ -414,7 +414,7 @@ secureapphelm-ibm-mq-2   0/1     Running   0          25m
 ```
 
 Relevant helm charts
-`
+
 ```
 # © Copyright IBM Corporation 2021, 2022
 #
