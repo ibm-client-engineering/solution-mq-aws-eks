@@ -577,7 +577,7 @@ route:
   loadBalancer:
     webconsole: true
     mqtraffic: true
-    loadBalancerSourceRanges: ["1.2.3.4/16","2.1.3.4/16"]
+    loadBalancerSourceRanges: ["1.2.3.4/16","2.1.3.4/16","192.168.0.0/16"]
 ```
 
 It's important to note that the loadBalancerSourceRanges are for inbound traffic to the cluster. Our example above shows a bunch of mostly private ip ranges, thus limiting traffic to whatever local network.
