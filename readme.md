@@ -401,7 +401,7 @@ Retrieve the VPC ID that your cluster is in and store it in a variable for use i
 Let's make life easier and just export the clustername as `$clustername` and the region as `$region`
 
 ```
-export clustername=mq-cluster-east
+export clustername=mq-cluster
 export region=us-east-1
 ```
 
