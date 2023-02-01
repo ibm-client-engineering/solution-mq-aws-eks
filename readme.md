@@ -545,21 +545,21 @@ kubectl create namespace mq-eks
 
 Git clone the following repo
 ```
-git clone https://github.com/ibm-messaging/mq-helm.git
+git clone https://github.com/ibm-client-engineering/mq-helm-eks.git
 ```
 
 ### Installation
 
 Add the helm chart to your repo
 ```
-helm repo add ibm-messaging-mq https://ibm-messaging.github.io/mq-helm
-"ibm-messaging-mq" has been added to your repositories
+helm repo add ibm-messaging-mq https://ibm-client-engineering.github.io/mq-helm-eks/
+"mq-helm-eks" has been added to your repositories
 ```
 
 Show all the charts in that repo
 
 ```
-helm show chart ibm-messaging-mq/ibm-mq
+helm show chart mq-helm-eks/ibm-mq
 
 apiVersion: v2
 appVersion: 9.3.1.0
@@ -771,8 +771,6 @@ secureapphelm-ibm-mq-1   0/1     Running   0          25m
 secureapphelm-ibm-mq-2   0/1     Running   0          25m
 ```
 #### Customization, using encrypted EFS, and deploying with loadbalancers and ingress
-
-
 
 Relevant helm charts
 
