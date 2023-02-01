@@ -776,8 +776,6 @@ secureapphelm-ibm-mq-2   0/1     Running   0          25m
 ```
 #### Customization, using encrypted EFS, and deploying with loadbalancers and ingress
 
-
-
 Relevant helm charts
 
 ```
