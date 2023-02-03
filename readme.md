@@ -177,6 +177,9 @@ aws eks update-kubeconfig --name mq-cluster --region us-east-1
 Added new context arn:aws:eks:us-east-1:748107796891:cluster/mq-cluster to /Users/user/.kube/config
 ```
 
+<<<<<<< HEAD
+#### Create MQ Namespace and Stage Helm Chart
+=======
 #### Prepare the cluster for Ingress, Loadbalancer, and EFS
 
 Associated an IAM oidc provider with the cluster. Assuming our region is `us-east-1`.
@@ -536,6 +539,7 @@ gp2 (default)   kubernetes.io/aws-ebs   Delete          WaitForFirstConsumer   f
 ```
 
 ### Create MQ Namespace and Stage Helm Chart
+>>>>>>> 3ad296e (Added the instructions for setting EFS)
 
 Create a namespace to deploy to
 
@@ -595,7 +599,19 @@ data:
     SET CHLAUTH('MTLSQMCHL') TYPE(SSLPEERMAP) SSLPEER('CN=application1,OU=app team1') USERSRC(MAP) MCAUSER('app1') ACTION(ADD)
     REFRESH SECURITY TYPE(CONNAUTH)
     SET AUTHREC PRINCIPAL('app1') OBJTYPE(QMGR) AUTHADD(CONNECT,INQ)
-    SET AUTHREC PROFILE('APPQ') PRINCIPAL('app1') OBJTYPE(QUEUE) AUTHADD(BROWSE,GET,INQ,PUT)
+    SET AUTHREC PROFILE('APPQ') PRINCIPAL('app1') OBJTYPE(QUEUE) AUTHADD(BROWSE,DSP,GET,INQ,PUT)
+    SET AUTHREC PROFILE('SYSTEM.ADMIN.COMMAND.QUEUE') OBJTYPE(QUEUE) PRINCIPAL('app1') AUTHADD(DSP, INQ, PUT)
+    SET AUTHREC PROFILE('SYSTEM.MQEXPLORER.REPLY.MODEL') OBJTYPE(QUEUE) PRINCIPAL('app1') AUTHADD(DSP, INQ, GET, PUT)
+    SET AUTHREC PROFILE('**') OBJTYPE(AUTHINFO) PRINCIPAL('app1') AUTHADD(ALLADM, CRT)
+    SET AUTHREC PROFILE('**') OBJTYPE(CHANNEL) PRINCIPAL('app1') AUTHADD(ALLADM, CRT)
+    SET AUTHREC PROFILE('**') OBJTYPE(CLNTCONN) PRINCIPAL('app1') AUTHADD(ALLADM, CRT)
+    SET AUTHREC PROFILE('**') OBJTYPE(COMMINFO) PRINCIPAL('app1') AUTHADD(ALLADM, CRT)
+    SET AUTHREC PROFILE('**') OBJTYPE(LISTENER) PRINCIPAL('app1') AUTHADD(ALLADM, CRT)
+    SET AUTHREC PROFILE('**') OBJTYPE(NAMELIST) PRINCIPAL('app1') AUTHADD(ALLADM, CRT)
+    SET AUTHREC PROFILE('**') OBJTYPE(PROCESS) PRINCIPAL('app1') AUTHADD(ALLADM, CRT)
+    SET AUTHREC OBJTYPE(QMGR) PRINCIPAL('app1') AUTHADD(ALLADM, CONNECT, INQ)
+    SET AUTHREC PROFILE('**') OBJTYPE(SERVICE) PRINCIPAL('app1') AUTHADD(ALLADM, CRT)
+    SET AUTHREC PROFILE('**') OBJTYPE(TOPIC) PRINCIPAL('app1') AUTHADD(ALLADM, CRT, ALLMQI)
   mq.ini: |-
     Service:
       Name=AuthorizationService
