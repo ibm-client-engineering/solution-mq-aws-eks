@@ -177,9 +177,6 @@ aws eks update-kubeconfig --name mq-cluster --region us-east-1
 Added new context arn:aws:eks:us-east-1:748107796891:cluster/mq-cluster to /Users/user/.kube/config
 ```
 
-<<<<<<< HEAD
-#### Create MQ Namespace and Stage Helm Chart
-=======
 #### Prepare the cluster for Ingress, Loadbalancer, and EFS
 
 Associated an IAM oidc provider with the cluster. Assuming our region is `us-east-1`.
@@ -521,11 +518,13 @@ parameters:
   fileSystemId: fs-02371262af220c220
   directoryPerms: "775"
   gidRangeStart: "1000" # optional
-  gidRangeEnd: "1025" # optional
+  gidRangeEnd: "3000" # optional
   basePath: "/efs/dynamic_provisioning" # optional
   uid: "2001" # This tells the provisioner to make the owner this uid
   gid: "65534" # This tells the provisioner to make the group owner this gid
 ```
+As a note for above, for MQ to work happily with EFS you need to specify the uid/gid in the storage class. Otherwise you will get permission errors when the container comes up and the process tries to update the `mq.ini` file.
+
 Apply the storage class with
 ```
 kubectl apply -f StorageClass.yaml
@@ -539,17 +538,11 @@ gp2 (default)   kubernetes.io/aws-ebs   Delete          WaitForFirstConsumer   f
 ```
 
 ### Create MQ Namespace and Stage Helm Chart
->>>>>>> 3ad296e (Added the instructions for setting EFS)
 
 Create a namespace to deploy to
 
 ```
 kubectl create namespace mq-eks
-```
-
-Git clone the following repo
-```
-git clone https://github.com/ibm-client-engineering/mq-helm-eks.git
 ```
 
 ### Installation
@@ -631,7 +624,7 @@ type: Opaque
 ```
 We create the above configmap so we don't persist the configuration. This means that it can be changed with a `kubectl edit deployment` or `helm upgrade`. As a configmap its mounted in the container and doesn't become immutable.
 
-This configmap will have several certs already encrypted base64 for testing that can always be updated.
+This configmap will have several certs already encrypted base64 for testing that can always be updated. As another note, the above config map settings for the container will allow access via MQ Explorer using the `admin` user with the password `mqpasswd`.
 
 - `mqekspoc_values.yaml`
 
@@ -675,22 +668,23 @@ queueManager:
         - mq.ini
   multiinstance:
     enable: false
-  persistence:
-    dataPVC:
-      enable: false
-      name: "data"
-      size: 2Gi
-      storageClassName: "ebs-sc"
-    logPVC:
-      enable: false
-      name: "log"
-      size: 2Gi
-      storageClassName: "ebs-sc"
-    qmPVC:
-      enable: true
-      name: "qm"
-      size: 2Gi
-      storageClassName: "ebs-sc"
+
+persistence:
+  dataPVC:
+    enable: false
+    name: "data"
+    size: 2Gi
+    storageClassName: "ebs-sc"
+  logPVC:
+    enable: false
+    name: "log"
+    size: 2Gi
+    storageClassName: "ebs-sc"
+  qmPVC:
+    enable: true
+    name: "qm"
+    size: 2Gi
+    storageClassName: "ebs-sc"
 
 security:
   context:
@@ -727,9 +721,26 @@ route:
   loadBalancer:
     webconsole: true
     mqtraffic: true
-    loadBalancerSourceRanges: ["10.0.0.0/8","162.76.0.0/16","192.168.0.0/16","169.184.0.0/16","172.16.0.0/12","100.64.0.0/10"]
+    awslbscheme: # Can be "internal" or "internet-facing". Defaults to "internet-facing" if not defined here. Only really applicable in AWS EKS.
+    loadBalancerSourceRanges: [] # This allows to lock your allowed traffic from specific subnets
+  ingress:
+    webconsole: 
+      enable: false
+      hostname: 
+      path: /
+      tls: 
+        enable: false 
+        secret: 
+    mqtraffic: 
+      enable: false
+      hostname: 
+      path: /
+      tls: 
+        enable: false
+        secret: 
     
 ```
+Extra settings above allow for using an `ingress` in AWS specifically, but will probably work in plain kubernetes.
 
 - Log into AWS EKS via CLI [ref](https://aws.amazon.com/premiumsupport/knowledge-center/eks-cluster-connection/)
 
