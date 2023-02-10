@@ -721,9 +721,26 @@ route:
   loadBalancer:
     webconsole: true
     mqtraffic: true
-    loadBalancerSourceRanges: []
+    awslbscheme: # Can be "internal" or "internet-facing". Defaults to "internet-facing" if not defined here. Only really applicable in AWS EKS.
+    loadBalancerSourceRanges: [] # This allows to lock your allowed traffic from specific subnets
+  ingress:
+    webconsole: 
+      enable: false
+      hostname: 
+      path: /
+      tls: 
+        enable: false 
+        secret: 
+    mqtraffic: 
+      enable: false
+      hostname: 
+      path: /
+      tls: 
+        enable: false
+        secret: 
     
 ```
+Extra settings above allow for using an `ingress` in AWS specifically, but will probably work in plain kubernetes.
 
 - Log into AWS EKS via CLI [ref](https://aws.amazon.com/premiumsupport/knowledge-center/eks-cluster-connection/)
 
