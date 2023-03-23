@@ -981,9 +981,6 @@ helm install mqekspoc charts/ibm-mq \
 --set "queueManager.envVariables[1].value=mqpasswd"
 ```
 
-```
-
-
 
 ### Verify the IBM MQ Deployment and Access
 
