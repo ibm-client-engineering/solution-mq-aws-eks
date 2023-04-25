@@ -37,14 +37,6 @@ The scope of this technical engagement includes the following:
 
 <img width="500" alt="image" src="https://user-images.githubusercontent.com/95059/211837985-f893a5bf-de58-47df-a996-10682e2c7fad.png">
 
-# Solution Strategy
-
-## Overview
-
-## Building Block View
-
-
-
 ## Deployment
 
 ### Requirements
